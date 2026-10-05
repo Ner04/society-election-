@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%97%B3%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Voting Booth</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/booth.css">
+</head>
+<body class="booth">
+<header class="b-top no-print">
+  <div>
+    <div class="title" id="hdrSociety">Society Election</div>
+    <div class="sub" id="hdrElection"></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="tbtn" id="btnLang" title="Language">हिंदी</button>
+  <button class="tbtn" id="btnSize" title="Text size">A+</button>
+  <button class="tbtn on" id="btnVoice" title="Voice guidance">🔊</button>
+</header>
+<div class="practice-banner hidden" id="practiceBanner"></div>
+<div class="steps hidden" id="steps"></div>
+
+<main class="b-main">
+
+  <!-- Loading -->
+  <section class="screen center" id="s-loading">
+    <div class="loader"></div>
+    <h2 style="margin-top:20px" data-t="loading">Getting the booth ready…</h2>
+    <p class="muted" id="loadMsg"></p>
+  </section>
+
+  <!-- Not open -->
+  <section class="screen center hidden" id="s-closed">
+    <div style="font-size:5rem">🗳️</div>
+    <h1 id="closedMsg"></h1>
+    <p class="lead" data-t="wait_officer">Please wait. The polling officer will start voting.</p>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="btn secondary big-btn" id="btnPractice2" data-t="practice">Practice first (not counted)</button>
+    </div>
+  </section>
+
+  <!-- Welcome -->
+  <section class="screen center hidden" id="s-welcome">
+    <h1 style="font-size:2.6rem" data-t="welcome_title">Welcome to the voting booth</h1>
+    <p class="lead" data-t="welcome_sub">Voting takes about 2 minutes. Take your time.</p>
+    <div class="how" id="how"></div>
+    <button class="btn huge ok" id="btnStart" data-t="start">Start Voting</button>
+    <button class="btn ghost big-btn" style="margin-top:14px" id="btnPractice" data-t="practice">Practice first (not counted)</button>
+  </section>
+
+  <!-- Find voter -->
+  <section class="screen hidden" id="s-find">
+    <div class="row" style="align-items:flex-end;margin-bottom:12px">
+      <div><h1 data-t="find_title">Find your name</h1><p class="lead" style="margin:0" data-t="find_sub"></p></div>
+      <div class="spacer"></div>
+      <button class="btn secondary big-btn" id="btnScan">📇 <span data-t="scan">Scan my voter slip</span></button>
+    </div>
+    <div class="find-grid">
+      <div>
+        <div class="search-box">🔍 <input id="q" autocomplete="off" spellcheck="false"></div>
+        <div class="kbd" id="kbd"></div>
+      </div>
+      <div>
+        <div class="results" id="results"></div>
+      </div>
+    </div>
+    <div class="navbar"><button class="btn secondary" data-go="welcome">← <span data-t="back">Back</span></button></div>
+  </section>
+
+  <!-- Scan slip -->
+  <section class="screen hidden" id="s-scan">
+    <h1 data-t="scan">Scan my voter slip</h1>
+    <p class="lead" data-t="scan_hint">Hold your voter slip in front of the camera</p>
+    <div class="cam-wrap" style="max-width:640px;width:100%;margin:0 auto">
+      <video id="qrVideo" autoplay muted playsinline></video>
+      <div class="cam-msg" id="qrMsg">📇</div>
+    </div>
+    <div class="navbar"><button class="btn secondary" id="btnScanBack">← <span data-t="type_instead">Type my name instead</span></button></div>
+  </section>
+
+  <!-- Face verification -->
+  <section class="screen hidden" id="s-face">
+    <h1 data-t="verify_title">Look at the camera</h1>
+    <div class="face-grid">
+      <div class="who">
+        <p class="lead" data-t="is_this_you">Is this you?</p>
+        <div id="whoAv"></div>
+        <div class="nm" id="whoName"></div>
+        <div class="fl" id="whoFlat"></div>
+        <div class="wt" id="whoWeight"></div>
+        <div id="faceStatus" class="face-status info"></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+          <button class="btn ok big-btn hidden" id="btnSelfConfirm" data-t="confirm_me">Yes, this is me</button>
+          <button class="btn secondary big-btn" id="btnNotMe" data-t="not_me">Not me — go back</button>
+          <button class="btn warn big-btn" id="btnOfficer">👮 <span data-t="officer">Call polling officer</span></button>
+        </div>
+      </div>
+      <div>
+        <div class="cam-wrap">
+          <video id="faceVideo" autoplay muted playsinline></video>
+          <canvas class="overlay" id="faceOverlay"></canvas>
+          <div class="cam-guide" id="camGuide"></div>
+          <div class="cam-msg" id="camMsg"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ballot -->
+  <section class="screen hidden" id="s-ballot">
+    <div class="post-head">
+      <div><div class="of" id="postOf"></div><h1 id="postName"></h1></div>
+    </div>
+    <div><span class="instr" id="postInstr"></span></div>
+    <div id="cands"></div>
+    <div class="navbar">
+      <button class="btn secondary" id="btnPrev">← <span data-t="back">Back</span></button>
+      <div class="dots" id="dots"></div>
+      <div class="chosen" id="chosen"></div>
+      <button class="btn" id="btnNext"><span data-t="next">Next</span> →</button>
+    </div>
+  </section>
+
+  <!-- Review -->
+  <section class="screen hidden" id="s-review">
+    <h1 data-t="review_title">Check your choices</h1>
+    <p class="lead" data-t="review_sub">If everything is correct, press the green button</p>
+    <p class="wt" id="revWeight"></p>
+    <div class="rev" id="rev"></div>
+    <div class="navbar">
+      <button class="btn secondary" id="btnRevBack">← <span data-t="back">Back</span></button>
+      <div class="spacer"></div>
+      <button class="btn ok" id="btnCast" style="font-size:1.5rem;padding:18px 48px">✔ <span data-t="cast">Cast My Vote</span></button>
+    </div>
+  </section>
+
+  <!-- Done -->
+  <section class="screen center hidden" id="s-done">
+    <div class="done-tick">✓</div>
+    <h1 id="doneTitle" style="font-size:2.3rem"></h1>
+    <p class="lead" id="doneSub"></p>
+    <p class="muted" id="doneCount"></p>
+  </section>
+</main>
+
+<script src="/vendor/face-api.js"></script>
+<script src="/vendor/jsQR.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/face.js"></script>
+<script src="/js/booth.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%97%B3%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Election Results</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { background: #0f1724; color: #fff; min-height: 100vh; font-size: 18px; }
+  .wrap { max-width: 1500px; margin: 0 auto; padding: 28px 36px; }
+  .hd { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .hd h1 { font-size: 34px; margin: 0; }
+  .hd .sub { opacity: .7; font-size: 20px; }
+  .clock { margin-left: auto; font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; opacity: .9; }
+  .pill { font-size: 16px; padding: 7px 16px; }
+  .turn { display: grid; grid-template-columns: auto 1fr; gap: 40px; align-items: center; background: #172235; border-radius: 22px; padding: 28px 36px; margin: 24px 0; }
+  .ring { width: 210px; height: 210px; }
+  .nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .nums .k { opacity: .65; font-size: 18px; font-weight: 600; }
+  .nums .v { font-size: 60px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .posts { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 22px; }
+  .post { background: #172235; border-radius: 20px; padding: 22px 26px; }
+  .post h2 { font-size: 26px; display: flex; gap: 12px; align-items: baseline; }
+  .post h2 small { opacity: .6; font-size: 17px; font-weight: 600; }
+  .row2 { display: grid; grid-template-columns: 54px 1fr 80px; gap: 14px; align-items: center; margin: 12px 0; }
+  .row2 .nm { font-weight: 700; font-size: 20px; }
+  .row2 .tr { height: 14px; background: #24324a; border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .row2 .tr i { display: block; height: 100%; background: #6b8cc7; border-radius: 99px; transition: width 1s; }
+  .row2.win .tr i { background: #4ade80; }
+  .row2 .vt { text-align: right; font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .win-badge { background: #4ade80; color: #08311a; font-size: 13px; padding: 3px 10px; border-radius: 6px; font-weight: 800; margin-left: 8px; text-transform: uppercase; }
+  .tie-badge { background: #fbbf24; color: #3b2a00; font-size: 13px; padding: 3px 10px; border-radius: 6px; font-weight: 800; margin-left: 8px; }
+  .wait { text-align: center; padding: 50px; background: #172235; border-radius: 22px; font-size: 26px; opacity: .85; }
+  .posts.single { grid-template-columns: 1fr; }
+  .tsum { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 6px 0 18px; }
+  .tbox { background: #0f1724; border-radius: 16px; padding: 14px 18px; border-top: 6px solid var(--team); }
+  .tnm { font-weight: 800; font-size: 20px; }
+  .tseat { font-size: 54px; font-weight: 800; line-height: 1.1; } .tseat span { font-size: 24px; opacity: .5; }
+  .twv { opacity: .65; font-size: 15px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; }
+  .rk { width: 40px; height: 40px; border-radius: 50%; background: #24324a; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; }
+  .row2.win .rk { background: #4ade80; color: #08311a; }
+  .row2[style*="--team"] .tr i { background: color-mix(in srgb, var(--team) 60%, #24324a); }
+  .row2.win[style*="--team"] .tr i { background: var(--team); filter: brightness(1.5); }
+  .row2.sm { grid-template-columns: 44px 1fr 80px; margin: 8px 0; }
+  .row2.sm .nm { font-size: 18px; } .row2.sm .vt { font-size: 24px; }
+  .tc { font-size: 16px; }
+  @media (max-width: 1000px) { .cols { grid-template-columns: 1fr; } }
+  .foot { text-align: center; opacity: .45; margin-top: 30px; font-size: 14px; }
+  @media (max-width: 800px) { .turn { grid-template-columns: 1fr; justify-items: center; } .nums .v { font-size: 40px; } .posts { grid-template-columns: 1fr; } .wrap { padding: 16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd"><div><h1 id="soc">Society Election</h1><div class="sub" id="el"></div></div><span class="pill" id="st"></span><div class="clock" id="clk"></div></div>
+  <div class="turn">
+    <svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#24324a" stroke-width="14"/>
+      <circle id="arc" cx="60" cy="60" r="52" fill="none" stroke="#4ade80" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 999" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 1s"/>
+      <text id="pct" x="60" y="66" text-anchor="middle" fill="#fff" font-size="24" font-weight="800">0%</text>
+      <text x="60" y="84" text-anchor="middle" fill="#9aa7bd" font-size="9" font-weight="600">TURNOUT</text></svg>
+    <div class="nums">
+      <div><div class="k">Votes cast</div><div class="v" id="n_v">0</div></div>
+      <div><div class="k">Weighted votes</div><div class="v" id="n_r">0</div></div>
+      <div><div class="k" id="k_f">Flats voted</div><div class="v" id="n_f">0</div></div>
+    </div>
+  </div>
+  <div id="res"></div>
+  <div class="foot">Updates automatically · Secret ballot — no one can see who voted for whom</div>
+</div>
+<script src="/js/common.js"></script>
+<script>
+async function tick() {
+  let d; try { d = await api('public/status'); } catch { return; }
+  $('#soc').textContent = d.society_name; $('#el').textContent = d.election_name;
+  document.title = d.election_name + ' – Results';
+  const p = $('#st'); p.className = 'pill ' + d.status; p.textContent = STATUS_LABEL[d.status];
+  const c = d.counts;
+  $('#n_v').textContent = c.ballots; $('#n_f').textContent = c.flats_voted + '/' + c.flats;
+  $('#n_r').innerHTML = `${c.weight_cast}<span style="font-size:24px;opacity:.55">/${c.weight_total}</span>`;
+  $('#pct').textContent = Math.round(c.turnout) + '%';
+  $('#arc').setAttribute('stroke-dasharray', `${(c.turnout / 100) * 326.7} 999`);
+  const photos = {}; d.posts.forEach(pp => pp.candidates.forEach(x => photos[x.id] = x.photo));
+  if (!d.show_results) {
+    $('#res').innerHTML = `<div class="wait">${d.status === 'setup' ? '🗳️ Voting will begin soon' : '🔒 Results will be announced after voting closes'}</div>`;
+    return;
+  }
+  const closed = d.status === 'closed';
+  $('#res').innerHTML = `${closed ? '<h2 style="font-size:30px;margin:0 0 16px">🏆 Final results</h2>' : ''}<div class="posts ${d.results.some(r => r.seats > 1) ? 'single' : ''}">${d.results.map(r => {
+    const tmap = {}; (r.teams || []).forEach(t => tmap[t.id] = t);
+    const max = Math.max(1, ...r.candidates.map(x => x.wvotes), r.wnota);
+    const ranked = [...r.candidates].sort((a, b) => b.wvotes - a.wvotes || b.votes - a.votes);
+    const small = ranked.length > 8;
+    const teams = (r.teams || []).length ? `<div class="tsum">${r.teams.map(t => `<div class="tbox" style="--team:${t.color}">
+        <div class="tnm">${esc(t.symbol || '')} ${esc(t.name)}</div><div class="tseat">${t.seats_won}<span>/${r.seats}</span></div>
+        <div class="twv">${closed ? 'seats won' : 'seats leading'} · ${t.wvotes} votes</div></div>`).join('')}</div>` : '';
+    return `<div class="post"><h2>${esc(r.name)} <small>${esc(r.name_hi || '')} · ${r.seats} seat${r.seats > 1 ? 's' : ''} · weighted votes</small></h2>${teams}
+      <div class="${small ? 'cols' : ''}">${ranked.map((x, i) => {
+        const w = r.leaders.includes(x.id); const tm = tmap[x.team_id];
+        return `<div class="row2 ${w ? 'win' : ''} ${small ? 'sm' : ''}" ${tm ? `style="--team:${tm.color}"` : ''}>
+          <span class="rk">${i + 1}</span>
+          <div><div class="nm">${esc(x.name)} ${tm ? `<span class="tc">${esc(tm.symbol || '')}</span>` : ''} ${w ? (r.tie ? '<span class="tie-badge">Tie</span>' : `<span class="win-badge">${closed ? 'Elected' : 'Leading'}</span>`) : ''}</div>
+          <div class="tr"><i style="width:${x.wvotes / max * 100}%"></i></div></div><div class="vt">${x.wvotes}</div></div>`;
+      }).join('')}</div>
+      <div class="row2 sm" style="opacity:.6"><span class="rk">–</span><div><div class="nm">NOTA</div><div class="tr"><i style="width:${r.wnota / max * 100}%;background:#64748b"></i></div></div><div class="vt">${r.wnota}</div></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+setInterval(() => { $('#clk').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }, 1000);
+tick(); setInterval(tick, 3000);
+</script>
+</body>
+</html>

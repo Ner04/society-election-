@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%97%B3%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Society Election</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 16px; }
+  h1 { font-size: 34px; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; color: var(--muted); margin-bottom: 34px; font-size: 17px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(220px, 300px)); gap: 20px; }
+  a.tile { display: block; text-decoration: none; color: inherit; background: #fff; border: 2px solid var(--line); border-radius: 20px; padding: 28px 24px; transition: border-color .15s, transform .15s; }
+  a.tile:hover { border-color: var(--primary); transform: translateY(-3px); }
+  a.tile .ic { font-size: 46px; }
+  a.tile h2 { margin: 12px 0 6px; font-size: 22px; }
+  a.tile p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .steps { max-width: 940px; margin-top: 38px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 26px; font-size: 14.5px; }
+  .steps ol { margin: 8px 0 0; padding-left: 20px; line-height: 1.8; }
+  @media (max-width: 760px) { .tiles { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <h1 id="soc">🗳️ Society Election</h1>
+  <div class="sub" id="el">Offline voting system</div>
+  <div class="tiles">
+    <a class="tile" href="/booth"><div class="ic">🗳️</div><h2>Voting Booth</h2><p>The screen voters use. Open on the booth computer, then press F11 / full screen.</p></a>
+    <a class="tile" href="/admin"><div class="ic">🛠️</div><h2>Admin Panel</h2><p>Add voters &amp; candidates, register faces, open/close voting, live counting, backups.</p></a>
+    <a class="tile" href="/display"><div class="ic">📺</div><h2>Results Screen</h2><p>For a TV or projector in the hall. Shows turnout live and results after closing.</p></a>
+  </div>
+  <div class="steps">
+    <b>Election day in 6 steps</b>
+    <ol>
+      <li><b>Admin Panel</b> → create PINs → add teams &amp; candidates → set <b>vote weight per block</b> (Settings) → add voters (or import from Excel CSV).</li>
+      <li>Register each voter's face (camera or photo). Print voter slips with QR codes (optional).</li>
+      <li>Do a <b>trial run</b> with committee members, then Settings → <i>Reset all votes</i>.</li>
+      <li>On election morning: Dashboard → <b>Open voting</b>. Put the booth screen in full screen.</li>
+      <li>Watch live turnout on the Dashboard. A polling officer helps anyone whose face isn't recognised (officer PIN).</li>
+      <li><b>Close voting</b> → print the result sheet → copy the <i>data</i> folder to a pen drive.</li>
+    </ol>
+  </div>
+<script src="/js/common.js"></script>
+<script>
+api('public/status').then(d => { $('#soc').textContent = '🗳️ ' + d.society_name; $('#el').textContent = d.election_name + ' · ' + STATUS_LABEL[d.status]; }).catch(() => {});
+</script>
+</body>
+</html>
